@@ -753,7 +753,7 @@ namespace Microsoft.Azure.WebJobs.Script
                 providers.AddRange(configFactory.GetWorkerProviders(_startupLogger));
             }
 
-            var workerConfigs = configFactory.GetConfigs(providers);
+            var workerConfigs = configFactory.GetConfigs(ScriptConfig, providers);
 
             _functionDispatcher = new FunctionRegistry(EventManager, server, channelFactory, workerConfigs);
 

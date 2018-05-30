@@ -30,7 +30,7 @@ namespace Microsoft.Azure.WebJobs.Script.Abstractions
         /// <summary>
         /// Gets or sets the default path to the worker (relative to the bin/workers/{language} directory)
         /// </summary>
-        [JsonProperty(PropertyName = "defaultWorkerPath", Required = Required.Always)]
+        [JsonProperty(PropertyName = "defaultWorkerPath")]
         public string DefaultWorkerPath { get; set; }
 
         /// <summary>
@@ -45,9 +45,30 @@ namespace Microsoft.Azure.WebJobs.Script.Abstractions
         [JsonProperty(PropertyName = "arguments")]
         public List<string> Arguments { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether or not the worker executable is relative to the script root directory.
+        /// </summary>
+        [JsonProperty(PropertyName = "isScriptRootRelative")]
+        public bool IsScriptRootRelative { get; set; }
+
         public string GetWorkerPath()
         {
+            if (WorkerDirectory == null || DefaultWorkerPath == null)
+            {
+                return null;
+            }
+
             return Path.Combine(WorkerDirectory, DefaultWorkerPath);
+        }
+
+        public string GetExecutablePath(string scriptRootPath)
+        {
+            if (!IsScriptRootRelative)
+            {
+                return DefaultExecutablePath;
+            }
+
+            return Path.Combine(scriptRootPath, DefaultExecutablePath);
         }
     }
 }

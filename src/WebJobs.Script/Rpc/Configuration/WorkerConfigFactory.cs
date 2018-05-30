@@ -35,7 +35,7 @@ namespace Microsoft.Azure.WebJobs.Script.Rpc
 
         public string WorkersDirPath { get; }
 
-        public IEnumerable<WorkerConfig> GetConfigs(IEnumerable<IWorkerProvider> providers)
+        public IEnumerable<WorkerConfig> GetConfigs(ScriptHostConfiguration config, IEnumerable<IWorkerProvider> providers)
         {
             foreach (var provider in providers)
             {
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.WebJobs.Script.Rpc
 
                 var arguments = new WorkerProcessArguments()
                 {
-                    ExecutablePath = description.DefaultExecutablePath,
+                    ExecutablePath = description.GetExecutablePath(config.RootScriptPath),
                     WorkerPath = description.GetWorkerPath()
                 };
 
@@ -135,7 +135,8 @@ namespace Microsoft.Azure.WebJobs.Script.Rpc
                 {
                     workerDescription.Arguments.AddRange(Regex.Split(argumentsSection.Value, @"\s+"));
                 }
-                if (File.Exists(workerDescription.GetWorkerPath()))
+                var workerPath = workerDescription.GetWorkerPath();
+                if (workerPath == null || File.Exists(workerPath))
                 {
                     logger.LogTrace($"Will load worker provider for language: {workerDescription.Language}");
                     _workerProviderDictionary[workerDescription.Language] = new GenericWorkerProvider(workerDescription, workerDir);
